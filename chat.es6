@@ -27,52 +27,55 @@ class Chatbot {
         return ( message.parentElement.parentElement.className.match(/user-(\d+)/) || [0, UID] )[1] != UID &&
           index > transcript.map(t => t.textContent.trim()).lastIndexOf(this.Options.Startup)
       }).forEach(message => this.onmessage.call({
-        "Text": message.textContent.trim().replace(/([a-z]\.)+(?:com|org|net|xyz)/g, "http://$&"),
+        "Text": message.textContent.trim().replace(/([A-Za-z]+\.)+(?:com|org|net|xyz)/g, "http://$&"),
         "HTML": message.innerHTML,
         "Raw" : message,
-
         "User": message.parentElement.parentElement.getElementsByClassName("username")[0].textContent.trim(),
 
+        // Special Functions
         "Speak": Text => this.Queue.push(Text),
-        "Reply": Text => this.Queue.push(`:${message.id.split("-")[1]} ${Text}`)
+        "Reply": Text => this.Queue.push(`:${message.id.split("-")[1]} ${Text}`),
+        "Data" : Text => Data(Text, this),
+        
+        // Other
+        "super": this
       }));
     }, 2100);
 
-    setInterval(() => {
-      if (this.Queue[0]) Talk(this.Queue.shift());
-    }, 1000);
+    setInterval(() => this.Queue[0] && Talk(this.Queue.shift()), 1000);
   }
 }
 
 /*
  * CHATGOAT v2.0
 **/
-let Admins = new Set(["Doᴡɴɢᴏᴀᴛ", "Chatgoat"]);
+const Admins = new Set(["Doᴡɴɢᴏᴀᴛ", "Chatgoat"]);
 
-let Commands = {
+const Commands = {
   "help": args => Object.keys(Commands).join(", "),
   "learn": (args, c) => ( Commands[ args[0] ] = () => Data(args.slice(1).join(" "), c), `Learned how to ${args[0]}!`),
-
-  // Random functions
-  "golf": args => {
-    let len = Math.floor(Math.random()*args.join(" ").length*.5)+1;
-    return Array(len).fill().map(() => String.fromCharCode(Math.floor(Math.random()*1200+255))).join("") + " is only " + 
-      (Math.floor(Math.random() * (len - 1)) + 1) + " bytes in the " +
-      Array(Math.floor(Math.random() * 2) + 2).fill().map(() => String.fromCharCode(Math.floor(Math.random() * 25) + 65)).join("") + "-" +
-      Math.floor(Math.random()*Math.pow(10, Math.floor(Math.random() * 4) + 2)) +
-      " encoding"
-  }
 };
 
-let Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name is $Name!" }, function() {
+const Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name is $Name!" }, function() {
   if (this.Text[0] === "/") { // Command
-    let Command = this.Text.split(" ")[0].slice(1); // Command
+    let [Command, ...Arguments] = Arguments = this.Text.split(" ");
     this.Speak(
-      Commands[Command](this.Text.split(" ").slice(1), this)
+      Commands[Command.slice(1)](Arguments, this)
     );
   } else {
-    if (/(Hello|Hi|Hey)(?=[^A-Za-z])/i.test(this.Text)) {
+    if (/(Hello|Hi|Hey)(?=[^A-Za-z]|$)/i.test(this.Text)) {
       this.Reply("Hello " + this.User + "!");
     }
   }
 });
+
+// EXTRA FUNCTIONS
+
+Commands["golf"] =  args => {
+  let len = Math.floor(Math.random()*args.join(" ").length*.5)+1;
+  return Array(len).fill().map(() => String.fromCharCode(Math.floor(Math.random()*1200+255))).join("") + " is only " + 
+    (Math.floor(Math.random() * (len - 1)) + 1) + " bytes in the " +
+    Array(Math.floor(Math.random() * 2) + 2).fill().map(() => String.fromCharCode(Math.floor(Math.random() * 25) + 65)).join("") + "-" +
+    Math.floor(Math.random()*Math.pow(10, Math.floor(Math.random() * 4) + 2)) +
+    " encoding"
+};

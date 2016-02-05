@@ -4,6 +4,8 @@
 // Helper Functions
 "use strict";
 
+function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
+
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -11,7 +13,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Talk = function Talk(text) {
   document.getElementById("input").value = text;document.getElementById("sayit-button").click();
 };
-var Data = function Data(text, instance) {
+var _Data = function _Data(text, instance) {
   return text.replace(/\$([A-Za-z$_]+[A-Za-z$_0-9]*)/g, function (_, v) {
     return instance[v];
   });
@@ -32,7 +34,7 @@ var Chatbot = function Chatbot(Name, _x, onmessage) {
   _classCallCheck(this, Chatbot);
 
   this.Name = Name;
-  this.Options = { Startup: Data(Startup, this), UID: UID };
+  this.Options = { Startup: _Data(Startup, this), UID: UID };
   this.onmessage = onmessage || function () {
     return void 0;
   };
@@ -55,24 +57,30 @@ var Chatbot = function Chatbot(Name, _x, onmessage) {
       }).lastIndexOf(_this.Options.Startup);
     }).forEach(function (message) {
       return _this.onmessage.call({
-        "Text": message.textContent.trim().replace(/([a-z]\.)+(?:com|org|net|xyz)/g, "http://$&"),
+        "Text": message.textContent.trim().replace(/([A-Za-z]+\.)+(?:com|org|net|xyz)/g, "http://$&"),
         "HTML": message.innerHTML,
         "Raw": message,
-
         "User": message.parentElement.parentElement.getElementsByClassName("username")[0].textContent.trim(),
 
+        // Special Functions
         "Speak": function Speak(Text) {
           return _this.Queue.push(Text);
         },
         "Reply": function Reply(Text) {
           return _this.Queue.push(":" + message.id.split("-")[1] + " " + Text);
-        }
+        },
+        "Data": function Data(Text) {
+          return _Data(Text, _this);
+        },
+
+        // Other
+        "super": _this
       });
     });
   }, 2100);
 
   setInterval(function () {
-    if (_this.Queue[0]) Talk(_this.Queue.shift());
+    return _this.Queue[0] && Talk(_this.Queue.shift());
   }, 1000);
 }
 
@@ -89,29 +97,38 @@ var Commands = {
   },
   "learn": function learn(args, c) {
     return (Commands[args[0]] = function () {
-      return Data(args.slice(1).join(" "), c);
+      return _Data(args.slice(1).join(" "), c);
     }, "Learned how to " + args[0] + "!");
-  },
-
-  // Random functions
-  "golf": function golf(args) {
-    var len = Math.floor(Math.random() * args.join(" ").length * .5) + 1;
-    return Array(len).fill().map(function () {
-      return String.fromCharCode(Math.floor(Math.random() * 1200 + 255));
-    }).join("") + " is only " + (Math.floor(Math.random() * (len - 1)) + 1) + " bytes in the " + Array(Math.floor(Math.random() * 2) + 2).fill().map(function () {
-      return String.fromCharCode(Math.floor(Math.random() * 25) + 65);
-    }).join("") + "-" + Math.floor(Math.random() * Math.pow(10, Math.floor(Math.random() * 4) + 2)) + " encoding";
   }
 };
 
 var Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name is $Name!" }, function () {
   if (this.Text[0] === "/") {
     // Command
-    var Command = this.Text.split(" ")[0].slice(1); // Command
-    this.Speak(Commands[Command](this.Text.split(" ").slice(1), this));
+
+    var _Arguments = Arguments = this.Text.split(" ");
+
+    var _Arguments2 = _toArray(_Arguments);
+
+    var Command = _Arguments2[0];
+
+    var Arguments = _Arguments2.slice(1);
+
+    this.Speak(Commands[Command.slice(1)](Arguments, this));
   } else {
-    if (/(Hello|Hi|Hey)(?=[^A-Za-z])/i.test(this.Text)) {
+    if (/(Hello|Hi|Hey)(?=[^A-Za-z]|$)/i.test(this.Text)) {
       this.Reply("Hello " + this.User + "!");
     }
   }
 });
+
+// EXTRA FUNCTIONS
+
+Commands["golf"] = function (args) {
+  var len = Math.floor(Math.random() * args.join(" ").length * .5) + 1;
+  return Array(len).fill().map(function () {
+    return String.fromCharCode(Math.floor(Math.random() * 1200 + 255));
+  }).join("") + " is only " + (Math.floor(Math.random() * (len - 1)) + 1) + " bytes in the " + Array(Math.floor(Math.random() * 2) + 2).fill().map(function () {
+    return String.fromCharCode(Math.floor(Math.random() * 25) + 65);
+  }).join("") + "-" + Math.floor(Math.random() * Math.pow(10, Math.floor(Math.random() * 4) + 2)) + " encoding";
+};
