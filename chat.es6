@@ -32,11 +32,14 @@ class Chatbot {
         "Raw" : message,
         "User": message.parentElement.parentElement.getElementsByClassName("username")[0].textContent.trim(),
 
+        // Data
+        "Mentions": [...message.querySelectorAll(".mention")].map(m => m.textContent.slice(1)),
+
         // Special Functions
         "Speak": Text => this.Queue.push(Text),
         "Reply": Text => this.Queue.push(`:${message.id.split("-")[1]} ${Text}`),
         "Data" : Text => Data(Text, this),
-        
+
         // Other
         "super": this
       }));
@@ -51,23 +54,176 @@ class Chatbot {
 **/
 const Admins = new Set(["Doᴡɴɢᴏᴀᴛ", "Chatgoat"]);
 
+let CSTART = "Hello!";
+let CONVERSATION = false;
+let CDATA = new Map();
+
 const Commands = {
-  "help": args => Object.keys(Commands).join(", "),
-  "learn": (args, c) => ( Commands[ args[0] ] = () => Data(args.slice(1).join(" "), c), `Learned how to ${args[0]}!`),
+  "help": self => Object.keys(Commands).join(", "),
+  "learn": self => ( Commands[ self.args[0] ] = () => Data(self.args.slice(1).join(" "), self.super), `Learned how to ${self.args[0]}!`),
+  "kill": self => Admins.has(self.User) ? `This conversation can serve no purpose anymore, Goodbye.` : `I'm sorry ${self.User} I'm afriad I can't let you do that`,
+  "start": self => (CONVERSATION = true, CSTART)
 };
 
-const Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name is $Name!" }, function() {
-  if (this.Text[0] === "/") { // Command
-    let [Command, ...Arguments] = Arguments = this.Text.split(" ");
-    this.Speak(
-      Commands[Command.slice(1)](Arguments, this)
-    );
+const UserRecord = new Map();
+const UserLookup = (user, prop, value = "") =>
+(UserRecord.get(user) ?
+ UserRecord.get(user).get(prop) || (UserRecord.get(user).set(prop, value), value) :
+ (UserRecord.set(user, new Map([[prop, value]])), value )
+);
+
+const UserModify = (user, prop, value) => (
+  UserRecord.get(user).set(prop, typeof value === "string" && value.indexOf('$') > -1 ?
+                           eval(value.replace(/\$/g, UserRecord.get(user).get(prop))) : value)
+);
+
+
+// Helper stuff
+
+const dist = (a,b) => {
+  if(a.length == 0) return b.length; 
+  if(b.length == 0) return a.length; 
+  var matrix = [];
+  for(var i = 0; i <= b.length; i++){
+    matrix[i] = [i];
+  }
+  for(var j = 0; j <= a.length; j++){
+    matrix[0][j] = j;
+  }
+  for(i = 1; i <= b.length; i++){
+    for(j = 1; j <= a.length; j++){
+      if(b.charAt(i-1) == a.charAt(j-1)){
+        matrix[i][j] = matrix[i-1][j-1];
+      } else {
+        matrix[i][j] = Math.min(matrix[i-1][j-1] + 1, Math.min(matrix[i][j-1] + 1, matrix[i-1][j] + 1));
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+}
+
+const Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello, My name is $Name! Type /help for help" }, function() {
+  if (CONVERSATION) {
+
+    const Trim = s => s.replace(/[^A-Za-z]/g, "").toLowerCase();
+
+    if (this.Mentions.indexOf("Chatgoat") > -1) {
+      CDATA.set(CSTART, this.Text);
+    } else {
+      let PendingResult = [];
+      CDATA.forEach((v, k) => {
+        if (!PendingResult[0]) {
+          let i = Math.floor(Math.random() * CDATA.size);
+          PendingResult = [[...CDATA.keys()][i], CDATA.get([...CDATA.keys()][i])];
+        } else if (dist(Trim(v), Trim(this.Text)) < dist(Trim(PendingResult[0]), Trim(this.Text))) {
+          PendingResult = [v,k];
+        }
+      });
+      
+      CSTART = PendingResult[1];
+      
+      CDATA.set(this.Text, CSTART);
+      
+      this.Reply(CSTART);
+    }
+    if (this.Text.indexOf("is") > -1) {
+      CDATA.set(this.Text.split("is")[0], this.Text.split("is")[1]);
+    }
   } else {
-    if (/(Hello|Hi|Hey)(?=[^A-Za-z]|$)/i.test(this.Text)) {
-      this.Reply("Hello " + this.User + "!");
+
+    if (this.Text[0] === "/") { // Command
+      let [Command, ...Arguments] = Arguments = this.Text.split(" ");
+      this.args = Arguments;
+      this.Speak(
+        Commands[Command.slice(1)](this)
+      );
+    } else {
+      if (RegExp(atob("Zlt1YV1jP2t8c2hpdHxkYW1uPw=="), 'i').test(this.Text)) {
+        switch (UserLookup(this.User, "offences", 0)) {
+          case 0:
+            this.Reply("Woah, language!");
+            break;
+          case 1:
+            this.Reply("Stop that!");
+            break;
+          case 2:
+            this.Reply("-_- Chatgoat does not appreciate that language");
+            break;
+          default:
+            this.Reply(RegExp(atob("Zlt1YV1jP2t8c2hpdHxkYW1uPw=="), 'i').exec(this.Text)[0] + " you too!");
+        }
+        UserModify(this.User, "offences", "$+1");
+      }
+      console.log(UserRecord);
+      if (UserLookup(this.User, "issad", false)) {
+        this.Speak("I'm sorry :(");
+        UserModify(this.User, "issad", false);
+      }
+      if (/:['",]?-?['",]?[[(c<{]|[}<D)\]][,'"]?-?[,'"]?:/.test(this.Text)) {
+        this.Speak("Why are you sad @" + this.User + "?"); UserModify(this.User, "issad", true);
+      }
+      if (/ಠ_ಠ|\.[_-]\./.test(this.Text)) {
+        this.Reply("¯\\\\_(ツ)_/¯");
+      }
+      if (/¯\\?_(ツ)_\/¯/.test(this.Text)) {
+        this.Reply("ಠ_ಠ");
+      }
+      if (/sor?ry|app?o?lo?gi?ze?/.test(this.Text)) {
+        UserModify(this.User, "offences", 1);
+        if (/(I'?m?\s+)?(sorr?y|app?o?lo?gi?ze?)/.test(this.Text)) {
+          UserModify(this.User, "offences", 0);
+          this.Reply("Apology Accepted :)");
+        }
+        this.Reply(":)");
+      }
+      if (/((g[oa]{1,2}t?|(you|u)('?re?)?|it('?s)?).+idiot|ass|stupid|dumb|filth?|disgust)|damn?\s*you/.test(this.Text)) {
+        switch (UserLookup(this.User, "meanness", 0)) {
+          case 0:
+            this.Reply(":'(");
+            break;
+          case 1:
+            this.Reply("You're mean D:");
+            break;
+          case 2:
+            this.Reply(":'( you " + atob("Yml0Y2g="));
+            break;
+          default:
+            this.Reply("Go away you rude" + atob("LWFzcw=="));
+        }
+        UserModify(this.User, "meanness", "$+1"); 
+      }
+      if (/(g[oa]{1,2}t|(you|u)'?re?)st\s+(\w+\s+)?mean/.test(this.Text)) {
+        this.Reply("I'm sorry :(");
+      }
+      if (/(Hello|Hi|Hey)(?=[^A-Za-z]|$)/i.test(this.Text)) {
+        this.Reply("Hello " + this.User + "!");
+      }
+      if (this.Text.replace(/@\S+/, "").replace(/[a-z]/g, s => s.toUpperCase()) === this.Text.replace(/@\S+/, "") &&
+          /[A-Z][AEIOU]|[AEIOU][A-Z]/.test(this.Text)) {
+        switch (UserLookup(this.User, "offences", 0)) {
+          case 0:
+            this.Reply("STOP SCREAMING!");
+            break;
+          case 1:
+            this.Reply("PLEASE STOP SCREAMING, IT IS VERY ANNOYING!");
+            break;
+          case 2:
+            this.Reply("PLEASE CALM DOWN");
+            break;
+          case 3:
+            this.Reply("DAMN IT, STOP SCREAMING ALREADY!");
+            break;
+          default:
+            this.Reply("SHUT UP ALREADY AND STOP SCREAMING!");
+
+        }
+        UserModify(this.User, "offences", "$+1");
+      }
     }
   }
 });
+
+setInterval(() => $(".message.pending > i > a:first-child").click(), 1000);
 
 // EXTRA FUNCTIONS
 
