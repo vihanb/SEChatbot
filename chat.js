@@ -163,9 +163,9 @@ var Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
             if (!PendingResult[0]) {
               var i = Math.floor(Math.random() * CDATA.size);
               PendingResult = [[].concat(_toConsumableArray(CDATA.keys()))[i], CDATA.get([].concat(_toConsumableArray(CDATA.keys()))[i])];
-            } else if (dist(Trim(v), Trim(this.Text)) == dist(Trim(PendingResult[0]), Trim(this.Text))) {
+            } else if (dist(Trim(v), Trim(_this2.Text)) == dist(Trim(PendingResult[0]), Trim(_this2.Text))) {
               if (Math.floor(Math.random())) PendingResult = [v, k];
-            } else if (dist(Trim(v), Trim(this.Text)) < dist(Trim(PendingResult[0]), Trim(this.Text))) {
+            } else if (dist(Trim(v), Trim(_this2.Text)) < dist(Trim(PendingResult[0]), Trim(_this2.Text))) {
               PendingResult = [v, k];
             }
           });

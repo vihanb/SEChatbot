@@ -109,7 +109,7 @@ let Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
 
     } else if (this.Mentions.length < 1) {
       let PendingResult = [];
-      CDATA.forEach(function (v, k) {
+      CDATA.forEach((v, k) => {
         if (!PendingResult[0]) {
           let i = Math.floor(Math.random() * CDATA.size);
           PendingResult = [[...CDATA.keys()][i], CDATA.get([...CDATA.keys()][i])];
