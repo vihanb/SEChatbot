@@ -99,6 +99,60 @@ const dist = (a, b) => {
   return matrix[b.length][a.length];
 };
 
+const getfreq = SOURCE => ([...SOURCE].toString().match(/[A-Za-z]+/g) || [""]).reduce((R, C) => {
+  if (R.has(C)) R.set(C, R.get(C) + 1);
+  else R.set(C, 1);
+  return R;
+}, new Map());
+
+const plotfc = (src) => {
+  const d = [...getfreq(src)].sort((a,b) => a[1] - b[1]);
+
+  if (d.length >= 5) { // Large enough store
+    // some fancy complex calculation to detemine stats of lexicon
+    const f = d.map((f,i,c) => (c[i+1]||[])[1] - f[1]).slice(0, -1);
+
+    // Length: L3M7
+    // Weight: 5 L1.5M2.5
+    const wl = d.map(f => [f[0], f[1] * (f[0].length < 3 ? 2 : f[0].length < 7 ? .5 : .75)]);
+
+    return new Map(wl);
+  } else { // weight by occurence off sample size
+    return new Map(d);
+  }
+};
+
+const weightphrase = ph => plotfc(ph.concat([...CDATA]));
+
+const weightdist = (p1, p2) => {
+
+  p1 = p1.match(/[A-Za-z-]+/g) || "RND";
+  p2 = p2.match(/[A-Za-z-]+/g) || "RND";
+
+  if (p1 === "RND" || p2 === "RND") return "RND";
+
+  let W = weightphrase(p1);
+  let P = weightphrase(p2);
+
+  const weightfactor = 10;
+
+  return p1.map(WORD => {
+    return (
+      weightfactor  // factoring weight for prescision
+      * W.get(WORD) // adjusted semantic frequency weight
+    ) *
+      Math.min(...p2.map(MATDIF => 
+                         dist(WORD, MATDIF) *           // Distance of
+                         (weightfactor / P.get(MATDIF)) // The inversed weight semantic frequency
+                        )
+              );
+  });
+};
+
+const phdif = (p1, p2) => {
+  return weightdist(p1, p2).reduce((a,b) => a + b); // TODO: improve this
+};
+
 let Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name is $Name!" }, function() {
   if (CONVERSATION) {
     const Trim = s => s.replace(/[^A-Za-z]/g, "").toLowerCase();
@@ -113,9 +167,9 @@ let Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
         if (!PendingResult[0]) {
           let i = Math.floor(Math.random() * CDATA.size);
           PendingResult = [[...CDATA.keys()][i], CDATA.get([...CDATA.keys()][i])];
-        } else if (dist(Trim(v), Trim(this.Text)) == dist(Trim(PendingResult[0]), Trim(this.Text))) {
+        } else if (phdif(v, this.Text) == phdif(PendingResult[0], this.Text)) {
           if (Math.floor(Math.random())) PendingResult = [v, k];
-        } else if (dist(Trim(v), Trim(this.Text)) < dist(Trim(PendingResult[0]), Trim(this.Text))) {
+        } else if (phdif(v, this.Text) < phdif(PendingResult[0], this.Text)) {
           PendingResult = [v, k];
         }
       });
@@ -127,7 +181,7 @@ let Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
       this.Reply(CSTART);
     }
 
-    if (/(?!)is/.test(this.Text)) {
+    if (/is/.test(this.Text)) {
       CDATA.set(this.Text.split("is")[0], this.Text.split("is")[1]);
     }
   } else {
@@ -156,7 +210,7 @@ let Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
         }
         UserModify(this.User, "offences", "$+1");
       }
-      
+
       if (UserLookup(this.User, "issad", false)) {
         this.Speak("I'm sorry :(");
         UserModify(this.User, "issad", false);
