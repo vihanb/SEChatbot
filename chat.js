@@ -93,6 +93,7 @@ var Admins = new Set(["Doᴡɴɢᴏᴀᴛ", "Chatgoat"]);
 var CSTART = "Hello!";
 var CONVERSATION = false;
 var CDATA = new Map();
+var ADATA = [];
 
 var Commands = {
   "help": function help(self) {
@@ -176,7 +177,7 @@ var plotfc = function plotfc(src) {
 };
 
 var weightphrase = function weightphrase(ph) {
-  return plotfc(ph.concat([].concat(_toConsumableArray(CDATA))));
+  return plotfc(ph.concat([].concat(_toConsumableArray(CDATA)), ADATA));
 };
 
 var weightdist = function weightdist(p1, p2) {
@@ -203,6 +204,7 @@ var weightdist = function weightdist(p1, p2) {
 };
 
 var phdif = function phdif(p1, p2) {
+  console.log(p1);
   return weightdist(p1, p2).reduce(function (a, b) {
     return a + b;
   }); // TODO: improve this
@@ -223,6 +225,7 @@ var Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
       (function () {
         var PendingResult = [];
         CDATA.forEach(function (v, k) {
+          console.log(v, _this2.Text, PendingResult[0]);
           if (!PendingResult[0]) {
             var i = Math.floor(Math.random() * CDATA.size);
             PendingResult = [[].concat(_toConsumableArray(CDATA.keys()))[i], CDATA.get([].concat(_toConsumableArray(CDATA.keys()))[i])];
@@ -233,9 +236,9 @@ var Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
           }
         });
 
-        CSTART = PendingResult[1];
+        CDATA.set(CSTART, _this2.Text);
 
-        CDATA.set(_this2.Text, CSTART);
+        CSTART = PendingResult[1];
 
         _this2.Reply(CSTART);
       })();

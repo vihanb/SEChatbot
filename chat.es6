@@ -56,6 +56,7 @@ let Admins = new Set(["Doᴡɴɢᴏᴀᴛ", "Chatgoat"]);
 let CSTART = "Hello!";
 let CONVERSATION = false;
 const CDATA = new Map();
+const ADATA = [];
 
 const Commands = {
   "help": self => Object.keys(Commands).join(", "),
@@ -122,7 +123,7 @@ const plotfc = (src) => {
   }
 };
 
-const weightphrase = ph => plotfc(ph.concat([...CDATA]));
+const weightphrase = ph => plotfc(ph.concat([...CDATA], ADATA));
 
 const weightdist = (p1, p2) => {
 
@@ -150,6 +151,7 @@ const weightdist = (p1, p2) => {
 };
 
 const phdif = (p1, p2) => {
+  console.log(p1);
   return weightdist(p1, p2).reduce((a,b) => a + b); // TODO: improve this
 };
 
@@ -164,6 +166,7 @@ let Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
     } else if (this.Mentions.length < 1) {
       let PendingResult = [];
       CDATA.forEach((v, k) => {
+        console.log(v, this.Text, PendingResult[0]);
         if (!PendingResult[0]) {
           let i = Math.floor(Math.random() * CDATA.size);
           PendingResult = [[...CDATA.keys()][i], CDATA.get([...CDATA.keys()][i])];
@@ -174,9 +177,9 @@ let Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
         }
       });
 
+      CDATA.set(CSTART, this.Text);
+      
       CSTART = PendingResult[1];
-
-      CDATA.set(this.Text, CSTART);
 
       this.Reply(CSTART);
     }
