@@ -123,8 +123,8 @@ var UserModify = function UserModify(user, prop, value) {
 };
 
 var dist = function dist(a, b) {
-  if (a.length == 0) return b.length;
-  if (b.length == 0) return a.length;
+  if (a.length == 0) return b.toLowerCase().length;
+  if (b.length == 0) return a.toLowerCase().length;
   var matrix = [];
   for (var i = 0; i <= b.length; i++) {
     matrix[i] = [i];
@@ -146,12 +146,13 @@ var dist = function dist(a, b) {
 
 var getfreq = function getfreq(SOURCE) {
   return ([].concat(_toConsumableArray(SOURCE)).toString().match(/[A-Za-z]+/g) || [""]).reduce(function (R, C) {
-    if (R.has(C)) R.set(C, R.get(C) + 1);else R.set(C, 1);
+    if (R.has(C.toLowerCase())) R.set(C.toLowerCase(), R.get(C) + 1);else R.set(C.toLowerCase(), 1);
     return R;
   }, new Map());
 };
 
 var plotfc = function plotfc(src) {
+  // F: new Map([...getfreq(CDATA)].sort((a,b) => b[1] - a[1]))
   var d = [].concat(_toConsumableArray(getfreq(src))).sort(function (a, b) {
     return a[1] - b[1];
   });
@@ -243,7 +244,7 @@ var Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
 
         CSTART = PendingResult[1];
 
-        _this2.Reply(CSTART);
+        _this2.Reply(("" + CSTART).replace(/undefined/g, "_UNK"));
       })();
     }
 

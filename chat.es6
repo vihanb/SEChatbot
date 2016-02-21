@@ -184,7 +184,7 @@ let Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
       
       CSTART = PendingResult[1];
 
-      this.Reply(CSTART);
+      this.Reply((""+CSTART).replace(/undefined/g, "_UNK"));
     }
 
     if (/is|are|'s|'re/.test(this.Text)) {
