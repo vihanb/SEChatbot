@@ -57,14 +57,14 @@ var Chatbot = function Chatbot(Name, _x, onmessage) {
       }).lastIndexOf(_this.Options.Startup);
     }).forEach(function (message) {
       return _this.onmessage.call({
-        "Text": message.textContent.trim().replace(/([a-z]\.)+(?:com|org|net|xyz)/g, "http://$&"),
+        "Text": message.textContent.trim(), /*.replace(/\b[a-z\.]+(?:com|org|net|xyz)/g, "http://$&")*/
         "HTML": message.innerHTML,
         "Raw": message,
 
         "User": message.parentElement.parentElement.getElementsByClassName("username")[0].textContent.trim(),
 
         "Mentions": [].concat(_toConsumableArray(message.querySelectorAll(".mention"))).map(function (m) {
-          return m.textContext.slice(1);
+          return (m.textContext || "").slice(1);
         }),
 
         "Speak": function Speak(Text) {
@@ -178,7 +178,7 @@ var Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
         })();
       }
 
-      if (_this2.Text.indexOf("is") > -1) {
+      if (/(?!)is/.test(_this2.Text)) {
         CDATA.set(_this2.Text.split("is")[0], _this2.Text.split("is")[1]);
       }
     })();

@@ -27,13 +27,13 @@ class Chatbot {
         return ( message.parentElement.parentElement.className.match(/user-(\d+)/) || [0, UID] )[1] != UID &&
           index > transcript.map(t => t.textContent.trim()).lastIndexOf(this.Options.Startup)
       }).forEach(message => this.onmessage.call({
-        "Text": message.textContent.trim().replace(/([a-z]\.)+(?:com|org|net|xyz)/g, "http://$&"),
+        "Text": message.textContent.trim()/*.replace(/\b[a-z\.]+(?:com|org|net|xyz)/g, "http://$&")*/,
         "HTML": message.innerHTML,
         "Raw" : message,
 
         "User": message.parentElement.parentElement.getElementsByClassName("username")[0].textContent.trim(),
 
-        "Mentions": [...message.querySelectorAll(".mention")].map(m => m.textContext.slice(1)),
+        "Mentions": [...message.querySelectorAll(".mention")].map(m => (m.textContext||"").slice(1)),
 
         "Speak": Text => this.Queue.push(Text),
         "Reply": Text => this.Queue.push(`:${message.id.split("-")[1]} ${Text}`),
@@ -127,7 +127,7 @@ let Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
       this.Reply(CSTART);
     }
 
-    if (this.Text.indexOf("is") > -1) {
+    if (/(?!)is/.test(this.Text)) {
       CDATA.set(this.Text.split("is")[0], this.Text.split("is")[1]);
     }
   } else {
