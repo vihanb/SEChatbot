@@ -177,15 +177,16 @@ var plotfc = function plotfc(src) {
 };
 
 var weightphrase = function weightphrase(ph) {
-  return plotfc(ph.concat([].concat(_toConsumableArray(CDATA)), ADATA));
+  return plotfc(ph.concat(ADATA));
 };
 
 var weightdist = function weightdist(p1, p2) {
+  if (p1 === undefined) p1 = "";
 
   p1 = p1.match(/[A-Za-z-]+/g) || "RND";
   p2 = p2.match(/[A-Za-z-]+/g) || "RND";
 
-  if (p1 === "RND" || p2 === "RND") return "RND";
+  if (p1 === "RND" || p2 === "RND") return [Infinity];
 
   var W = weightphrase(p1);
   var P = weightphrase(p2);
@@ -218,6 +219,8 @@ var Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
       return s.replace(/[^A-Za-z]/g, "").toLowerCase();
     };
 
+    ADATA.push(this.Text);
+
     if (CDATA.size === 0) {
 
       CDATA.set(CSTART, this.Text);
@@ -244,7 +247,7 @@ var Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
       })();
     }
 
-    if (/is/.test(this.Text)) {
+    if (/is|are|'s|'re/.test(this.Text)) {
       CDATA.set(this.Text.split("is")[0], this.Text.split("is")[1]);
     }
   } else {

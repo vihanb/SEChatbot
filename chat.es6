@@ -79,8 +79,8 @@ const UserModify = (user, prop, value) => (
                            eval(value.replace(/\$/g, UserRecord.get(user).get(prop))) : value));
 
 const dist = (a, b) => {
-  if (a.length == 0) return b.length;
-  if (b.length == 0) return a.length;
+  if (a.length == 0) return b.toLowerCase().length;
+  if (b.length == 0) return a.toLowerCase().length;
   let matrix = [];
   for (var i = 0; i <= b.length; i++) {
     matrix[i] = [i];
@@ -101,12 +101,13 @@ const dist = (a, b) => {
 };
 
 const getfreq = SOURCE => ([...SOURCE].toString().match(/[A-Za-z]+/g) || [""]).reduce((R, C) => {
-  if (R.has(C)) R.set(C, R.get(C) + 1);
-  else R.set(C, 1);
+  if (R.has(C.toLowerCase())) R.set(C.toLowerCase(), R.get(C) + 1);
+  else R.set(C.toLowerCase(), 1);
   return R;
 }, new Map());
 
 const plotfc = (src) => {
+  // F: new Map([...getfreq(CDATA)].sort((a,b) => b[1] - a[1]))
   const d = [...getfreq(src)].sort((a,b) => a[1] - b[1]);
 
   if (d.length >= 5) { // Large enough store
@@ -123,14 +124,14 @@ const plotfc = (src) => {
   }
 };
 
-const weightphrase = ph => plotfc(ph.concat([...CDATA], ADATA));
+const weightphrase = ph => plotfc(ph.concat(ADATA));
 
-const weightdist = (p1, p2) => {
+const weightdist = (p1 = "", p2) => {
 
   p1 = p1.match(/[A-Za-z-]+/g) || "RND";
   p2 = p2.match(/[A-Za-z-]+/g) || "RND";
 
-  if (p1 === "RND" || p2 === "RND") return "RND";
+  if (p1 === "RND" || p2 === "RND") return [Infinity];
 
   let W = weightphrase(p1);
   let P = weightphrase(p2);
@@ -159,6 +160,8 @@ let Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
   if (CONVERSATION) {
     const Trim = s => s.replace(/[^A-Za-z]/g, "").toLowerCase();
 
+    ADATA.push(this.Text);
+    
     if (CDATA.size === 0) {
 
       CDATA.set(CSTART, this.Text);
@@ -184,7 +187,7 @@ let Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
       this.Reply(CSTART);
     }
 
-    if (/is/.test(this.Text)) {
+    if (/is|are|'s|'re/.test(this.Text)) {
       CDATA.set(this.Text.split("is")[0], this.Text.split("is")[1]);
     }
   } else {
