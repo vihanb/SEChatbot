@@ -128,8 +128,8 @@ const weightphrase = ph => plotfc(ph.concat(ADATA));
 
 const weightdist = (p1 = "", p2) => {
 
-  p1 = p1.match(/[A-Za-z-]+/g) || "RND";
-  p2 = p2.match(/[A-Za-z-]+/g) || "RND";
+  p1 = p1.match(/[A-Za-z'-]+/g) || "RND";
+  p2 = p2.match(/[A-Za-z'-]+/g) || "RND";
 
   if (p1 === "RND" || p2 === "RND") return [Infinity];
 
@@ -152,7 +152,7 @@ const weightdist = (p1 = "", p2) => {
 };
 
 const phdif = (p1, p2) => {
-  console.log(p1);
+  // console.log(p1);
   return weightdist(p1, p2).reduce((a,b) => a + b); // TODO: improve this
 };
 
