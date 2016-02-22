@@ -100,8 +100,12 @@ const dist = (a, b) => {
   return matrix[b.length][a.length];
 };
 
-const getfreq = SOURCE => ([...SOURCE].toString().match(/[A-Za-z]+/g) || [""]).reduce((R, C) => {
-  if (R.has(C.toLowerCase())) R.set(C.toLowerCase(), R.get(C) + 1);
+const standardize = s => (s
+                          .replace(/ok|k|okay/ig, "okay")
+                          .replace(/teh/gi, "the"));
+
+const getfreq = SOURCE => standardize([...SOURCE].toString().match(/[A-Za-z]+/g) || [""]).reduce((R, C) => {
+  if (R.has(C.toLowerCase())) R.set(C.toLowerCase(), (R.get(C) || 1) + 1);
   else R.set(C.toLowerCase(), 1);
   return R;
 }, new Map());
@@ -161,7 +165,7 @@ let Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
     const Trim = s => s.replace(/[^A-Za-z]/g, "").toLowerCase();
 
     ADATA.push(this.Text);
-    
+
     if (CDATA.size === 0) {
 
       CDATA.set(CSTART, this.Text);
@@ -181,7 +185,7 @@ let Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
       });
 
       CDATA.set(CSTART, this.Text);
-      
+
       CSTART = PendingResult[1];
 
       this.Reply((""+CSTART).replace(/undefined/g, "_UNK"));
@@ -284,3 +288,5 @@ let Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
     }
   }
 });
+
+setTimeout('$(".message.pending a:first-child").click();', 1000);

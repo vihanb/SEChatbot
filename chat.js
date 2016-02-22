@@ -146,7 +146,7 @@ var dist = function dist(a, b) {
 
 var getfreq = function getfreq(SOURCE) {
   return ([].concat(_toConsumableArray(SOURCE)).toString().match(/[A-Za-z]+/g) || [""]).reduce(function (R, C) {
-    if (R.has(C.toLowerCase())) R.set(C.toLowerCase(), R.get(C) + 1);else R.set(C.toLowerCase(), 1);
+    if (R.has(C.toLowerCase())) R.set(C.toLowerCase(), (R.get(C) || 1) + 1);else R.set(C.toLowerCase(), 1);
     return R;
   }, new Map());
 };
@@ -184,8 +184,8 @@ var weightphrase = function weightphrase(ph) {
 var weightdist = function weightdist(p1, p2) {
   if (p1 === undefined) p1 = "";
 
-  p1 = p1.match(/[A-Za-z-]+/g) || "RND";
-  p2 = p2.match(/[A-Za-z-]+/g) || "RND";
+  p1 = p1.match(/[A-Za-z'-]+/g) || "RND";
+  p2 = p2.match(/[A-Za-z'-]+/g) || "RND";
 
   if (p1 === "RND" || p2 === "RND") return [Infinity];
 
@@ -206,7 +206,7 @@ var weightdist = function weightdist(p1, p2) {
 };
 
 var phdif = function phdif(p1, p2) {
-  console.log(p1);
+  // console.log(p1);
   return weightdist(p1, p2).reduce(function (a, b) {
     return a + b;
   }); // TODO: improve this
@@ -223,7 +223,6 @@ var Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
     ADATA.push(this.Text);
 
     if (CDATA.size === 0) {
-
       CDATA.set(CSTART, this.Text);
     } else if (this.Mentions.length < 1) {
       (function () {
