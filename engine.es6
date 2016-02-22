@@ -44,3 +44,15 @@ class Chatbot {
     }, 1000);
   }
 }
+
+// How to use:
+/*
+let MyChatbot = new Chatbot("<CHATBOT NAME>", { UID: <CHATBOT ACCOUNT UID, Startup: "<WHAT TO SAY ON STARTUP ($Name) is Chatbot's name>" }, function() {
+  // Chatbot Code which runs every message
+  // this.Text contains message text
+  // use this.Speak() to speak
+  // use this.Reply() to reply
+  // use this.Mentions to see who was mentioned in the message
+  // use this.HTML to get raw message HTML
+});
+*/
