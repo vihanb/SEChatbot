@@ -144,8 +144,12 @@ var dist = function dist(a, b) {
   return matrix[b.length][a.length];
 };
 
+var standardize = function standardize(s) {
+  return s.replace(/ok|k|okay/ig, "okay").replace(/teh/gi, "the");
+};
+
 var getfreq = function getfreq(SOURCE) {
-  return ([].concat(_toConsumableArray(SOURCE)).toString().match(/[A-Za-z]+/g) || [""]).reduce(function (R, C) {
+  return standardize([].concat(_toConsumableArray(SOURCE)).toString().match(/[A-Za-z]+/g) || [""]).reduce(function (R, C) {
     if (R.has(C.toLowerCase())) R.set(C.toLowerCase(), (R.get(C) || 1) + 1);else R.set(C.toLowerCase(), 1);
     return R;
   }, new Map());
@@ -223,18 +227,21 @@ var Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
     ADATA.push(this.Text);
 
     if (CDATA.size === 0) {
+
       CDATA.set(CSTART, this.Text);
     } else if (this.Mentions.length < 1) {
       (function () {
         var PendingResult = [];
         CDATA.forEach(function (v, k) {
           console.log(v, _this2.Text, PendingResult[0]);
+          var DV = phdif(v, _this2.Text);
+          var PV = phdif(PendingResult[0], _this2.Text);
           if (!PendingResult[0]) {
             var i = Math.floor(Math.random() * CDATA.size);
             PendingResult = [[].concat(_toConsumableArray(CDATA.keys()))[i], CDATA.get([].concat(_toConsumableArray(CDATA.keys()))[i])];
-          } else if (phdif(v, _this2.Text) == phdif(PendingResult[0], _this2.Text)) {
+          } else if (DV == PD) {
             if (Math.floor(Math.random())) PendingResult = [v, k];
-          } else if (phdif(v, _this2.Text) < phdif(PendingResult[0], _this2.Text)) {
+          } else if (DV < PD) {
             PendingResult = [v, k];
           }
         });
@@ -351,3 +358,5 @@ var Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
     }
   }
 });
+
+setTimeout('$(".message.pending a:first-child").click();', 1000);

@@ -174,12 +174,14 @@ let Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
       let PendingResult = [];
       CDATA.forEach((v, k) => {
         console.log(v, this.Text, PendingResult[0]);
+        let DV = phdif(v, this.Text);
+        let PV = phdif(PendingResult[0], this.Text);
         if (!PendingResult[0]) {
           let i = Math.floor(Math.random() * CDATA.size);
           PendingResult = [[...CDATA.keys()][i], CDATA.get([...CDATA.keys()][i])];
-        } else if (phdif(v, this.Text) == phdif(PendingResult[0], this.Text)) {
+        } else if (DV == PD) {
           if (Math.floor(Math.random())) PendingResult = [v, k];
-        } else if (phdif(v, this.Text) < phdif(PendingResult[0], this.Text)) {
+        } else if (DV < PD) {
           PendingResult = [v, k];
         }
       });
