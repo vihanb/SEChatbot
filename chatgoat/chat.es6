@@ -44,7 +44,7 @@ class Chatbot {
 
     setInterval(() => {
       if (this.Queue[0]) Talk(this.Queue.shift());
-    }, 1000);
+    }, 2000);
   }
 }
 
@@ -104,14 +104,14 @@ const standardize = s => (s
                           .replace(/ok|k|okay/ig, "okay")
                           .replace(/teh/gi, "the"));
 
-const getfreq = SOURCE => standardize([...SOURCE].toString().match(/[A-Za-z]+/g) || [""]).reduce((R, C) => {
+const getfreq = SOURCE => (standardize([...SOURCE].toString()).match(/[A-Za-z]+/g) || [""]).reduce((R, C) => {
   if (R.has(C.toLowerCase())) R.set(C.toLowerCase(), (R.get(C) || 1) + 1);
   else R.set(C.toLowerCase(), 1);
   return R;
 }, new Map());
 
 const plotfc = (src) => {
-  // F: new Map([...getfreq(CDATA)].sort((a,b) => b[1] - a[1]))
+  // F: new Map([...getfreq(ADATA)].sort((a,b) => b[1] - a[1]))
   const d = [...getfreq(src)].sort((a,b) => a[1] - b[1]);
 
   if (d.length >= 5) { // Large enough store
@@ -130,8 +130,10 @@ const plotfc = (src) => {
 
 const weightphrase = ph => plotfc(ph.concat(ADATA));
 
-const weightdist = (p1 = "", p2) => {
+const weightdist = (p1, p2) => {
 
+  if (typeof p1 !== "string") p1 = "";
+  
   p1 = p1.match(/[A-Za-z'-]+/g) || "RND";
   p2 = p2.match(/[A-Za-z'-]+/g) || "RND";
 
@@ -170,18 +172,14 @@ let Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
 
       CDATA.set(CSTART, this.Text);
 
-    } else if (this.Mentions.length < 1) {
-      let PendingResult = [];
+    } else if (this.Text.indexOf('@') < 0) {
+      let PendingResult = [...CDATA][Math.floor(Math.random() * CDATA.size)];
       CDATA.forEach((v, k) => {
-        console.log(v, this.Text, PendingResult[0]);
         let DV = phdif(v, this.Text);
         let PV = phdif(PendingResult[0], this.Text);
-        if (!PendingResult[0]) {
-          let i = Math.floor(Math.random() * CDATA.size);
-          PendingResult = [[...CDATA.keys()][i], CDATA.get([...CDATA.keys()][i])];
-        } else if (DV == PD) {
+        if (DV == PV) {
           if (Math.floor(Math.random())) PendingResult = [v, k];
-        } else if (DV < PD) {
+        } else if (DV < PV) {
           PendingResult = [v, k];
         }
       });
@@ -190,12 +188,12 @@ let Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
 
       CSTART = PendingResult[1];
 
-      this.Reply((""+CSTART).replace(/undefined/g, "_UNK"));
+      this.Reply((""+CSTART).replace(/undefined/g, "_UNK").replace(/@\S+\s*/, ""));
     }
 
-    if (/is|are|'s|'re/.test(this.Text)) {
-      CDATA.set(this.Text.split("is")[0], this.Text.split("is")[1]);
-    }
+    //if (/\b(is|are|'s|'re)/.test(this.Text)) {
+    //  CDATA.set(this.Text.split(/\b(is|are|'s|'re)/)[0], this.Text.split(/\b(is|are|'s|'re)/)[1]);
+    //}
   } else {
 
     if (this.Text[0] === "/") {
@@ -291,4 +289,4 @@ let Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name i
   }
 });
 
-setTimeout('$(".message.pending a:first-child").click();', 1000);
+setInterval(() => $(".message.pending a:first-child").click(), 1000);
