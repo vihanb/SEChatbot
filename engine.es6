@@ -41,7 +41,7 @@ class Chatbot {
 
     setInterval(() => {
       if (this.Queue[0]) Talk(this.Queue.shift());
-    }, 1000);
+    }, 2000);
   }
 }
 
