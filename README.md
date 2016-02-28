@@ -30,8 +30,8 @@ You can use `this` within the `onmessage` function to handle the data.
 Here are all the variables it provides you:
 
 ```js
-this.Text // The text of the message receives
-this.HTML // HTML of the message receives (string)
+this.Text // The text of the received message 
+this.HTML // HTML of the received message (as a string)
 this.Raw  // The messages DOM element
 
 this.User     // The username of the user which posted the message
