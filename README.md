@@ -50,7 +50,11 @@ this.Reply("Hello!") // Replied to the receieved message
 Here's an example:
 
 ```js
-var Chatgoat = new Chatbot("Chatgoat", { UID: 180858, Startup: "Hello! My name is $Name!" }, function() {
+var Chatgoat = new Chatbot("Chatgoat", {
+    UID: 180858,
+    Startup: "Hello! My name is $Name!"
+  }, function() {
+  // If the message text contains "hello" respond with "Hello!"
   if (/hello/i.test(this.Text)) this.Reply("Hello!")
 });
 ```
