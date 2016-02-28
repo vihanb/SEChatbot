@@ -35,7 +35,7 @@ this.HTML // HTML of the received message (as a string)
 this.Raw  // The messages DOM element
 
 this.User     // The username of the user which posted the message
-this.Mentions // usernames of all the users @-mentioned in the message
+this.Mentions // (THIS DOES NOT WORK AS OF NOW) usernames of all the users @-mentioned in the message
 ```
 
 Here are the functions you can use:

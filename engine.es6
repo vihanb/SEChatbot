@@ -41,7 +41,7 @@ class Chatbot {
 
     setInterval(() => {
       if (this.Queue[0]) Talk(this.Queue.shift());
-    }, 2000);
+    }, 2500);
   }
 }
 
@@ -54,5 +54,6 @@ let MyChatbot = new Chatbot("<CHATBOT NAME>", { UID: <CHATBOT ACCOUNT UID, Start
   // use this.Reply() to reply
   // use this.Mentions to see who was mentioned in the message
   // use this.HTML to get raw message HTML
+  console.log(this);
 });
 */
