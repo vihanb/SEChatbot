@@ -6,17 +6,14 @@ This is an engine which allows you to easily and quickly create SE Chatbot's in 
  - `engine.es6` the ES6 version of the Chatbot engine
  - `engine.js`  the transpiled ES5 version of the Chatbot
  - `engine.all.js` a version of the engine which supports older browsers
- - `engine.min.js` a minified verision of the ES5 engine
+ - `engine.min.js` a minified verision of the ES5 qengine
 
 ## Getting Started
 
 Place the code in `engine.js` at the beginning of your program. To start your Chatbot, use:
 
 ```js
-var MyChatbot = new Chatbot("<CHATBOT NAME>", {
-    UID: <USERID OF THE CHATBOT>,
-    Startup: "What to say on the chatbot's startup (formatted)"
-  },
+var MyChatbot = new Chatbot("<CHATBOT NAME>", { Startup: "What to say on the chatbot's startup (formatted)" },
   function() { // This is the `onmessage` function
   // This function runs whenever a new message occurs
 });
@@ -48,6 +45,7 @@ Here are the functions you can use:
 ```js
 this.Speak("Hello!") // Says "Hello"
 this.Reply("Hello!") // Replied to the receieved message
+this.Star()          // Stars the message
 ```
 
 ## Example Chatbot
@@ -55,12 +53,11 @@ this.Reply("Hello!") // Replied to the receieved message
 Here's an example:
 
 ```js
-var Chatgoat = new Chatbot("Chatgoat", {
-    UID: 180858,
-    Startup: "Hello! My name is $Name!"
-  }, function() {
+var Chatgoat = new Chatbot("Chatgoat", { Startup: "Hello! My name is $Name!" }, function() {
   // If the message text contains "hello" respond with "Hello!"
   if (/hello/i.test(this.Text)) this.Reply("Hello!")
+  // Star all lennys
+  if (/\( ͡° ͜ʖ ͡°\)/.test(this.Text)) this.Star();
 });
 ```
 

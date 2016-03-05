@@ -2,9 +2,9 @@ const Talk = text => { document.getElementById("input").value = text; document.g
 const Data = (text, instance) => text.replace(/\$([A-Za-z$_]+[A-Za-z$_0-9]*)/g, (_, v) => instance[v])
 
 class Chatbot {
-  constructor(Name = "a Chatbot", { Startup = "Hi my name is $Name!", UID = 0 } = {}, onmessage) {
+  constructor(Name = "a Chatbot", { Startup = "Hi my name is $Name!" } = {}, onmessage) {
     this.Name = Name;
-    this.Options = { Startup: Data(Startup, this), UID };
+    this.Options = { Startup: Data(Startup, this), UID: CHAT.CURRENT_USER_ID };
     this.onmessage = onmessage || () => void 0;
 
     this.Queue = [];
@@ -34,7 +34,8 @@ class Chatbot {
 
         "Speak": Text => this.Queue.push(Text),
         "Reply": Text => this.Queue.push(`:${message.id.split("-")[1]} ${Text}`),
-
+        "Star" : Text => message.querySelector(".meta > .stars > .vote").click(),
+        
         "super": this
       }));
     }, 2100);
@@ -52,6 +53,7 @@ let MyChatbot = new Chatbot("<CHATBOT NAME>", { UID: <CHATBOT ACCOUNT UID, Start
   // this.Text contains message text
   // use this.Speak() to speak
   // use this.Reply() to reply
+  // use this.Star()  to star the message
   // use this.Mentions to see who was mentioned in the message
   // use this.HTML to get raw message HTML
   console.log(this);

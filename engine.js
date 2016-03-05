@@ -23,13 +23,11 @@ var Chatbot = function Chatbot(Name, _x, onmessage) {
 
   var _ref$Startup = _ref.Startup;
   var Startup = _ref$Startup === undefined ? "Hi my name is $Name!" : _ref$Startup;
-  var _ref$UID = _ref.UID;
-  var UID = _ref$UID === undefined ? 0 : _ref$UID;
 
   _classCallCheck(this, Chatbot);
 
   this.Name = Name;
-  this.Options = { Startup: Data(Startup, this), UID: UID };
+  this.Options = { Startup: Data(Startup, this), UID: CHAT.CURRENT_USER_ID };
   this.onmessage = onmessage || function () {
     return void 0;
   };
@@ -68,6 +66,9 @@ var Chatbot = function Chatbot(Name, _x, onmessage) {
         "Reply": function Reply(Text) {
           return _this.Queue.push(":" + message.id.split("-")[1] + " " + Text);
         },
+        "Star": function Star(Text) {
+          return message.querySelector(".meta > .stars > .vote").click();
+        },
 
         "super": _this
       });
@@ -86,6 +87,7 @@ let MyChatbot = new Chatbot("<CHATBOT NAME>", { UID: <CHATBOT ACCOUNT UID, Start
   // this.Text contains message text
   // use this.Speak() to speak
   // use this.Reply() to reply
+  // use this.Star()  to star the message
   // use this.Mentions to see who was mentioned in the message
   // use this.HTML to get raw message HTML
   console.log(this);
