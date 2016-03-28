@@ -5,7 +5,7 @@ class Chatbot {
   constructor(Name = "a Chatbot", { Startup = "Hi my name is $Name!" } = {}, onmessage) {
     this.Name = Name;
     this.Options = { Startup: Data(Startup, this), UID: CHAT.CURRENT_USER_ID };
-    this.onmessage = onmessage || () => void 0;
+    this.onmessage = onmessage || function(){};
 
     this.Queue = [];
     // Private
