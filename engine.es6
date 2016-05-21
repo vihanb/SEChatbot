@@ -3,8 +3,10 @@ const Data = (text, instance) => text.replace(/\$([A-Za-z$_]+[A-Za-z$_0-9]*)/g, 
 
 class Chatbot {
   constructor(Name = "a Chatbot", { Startup = "Hi my name is $Name!" } = {}, onmessage) {
+    const UID = CHAT.CURRENT_USER_ID;
+    
     this.Name = Name;
-    this.Options = { Startup: Data(Startup, this), UID: CHAT.CURRENT_USER_ID };
+    this.Options = { Startup: Data(Startup, this), UID: CHAT.UID };
     this.onmessage = onmessage || function(){};
 
     this.Queue = [];
