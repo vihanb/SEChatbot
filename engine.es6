@@ -6,7 +6,7 @@ class Chatbot {
     const UID = CHAT.CURRENT_USER_ID;
     
     this.Name = Name;
-    this.Options = { Startup: Data(Startup, this), UID: CHAT.UID };
+    this.Options = { Startup: Data(Startup, this), UID: UID };
     this.onmessage = onmessage || function(){};
 
     this.Queue = [];
@@ -20,7 +20,7 @@ class Chatbot {
 
     // Read
     setInterval(() => {
-      [...document.getElementsByClassName("message")].filter((message, index, transcript) => {
+      Array.from(document.getElementsByClassName("message")).filter((message, index, transcript) => {
         if (this[Called].has(message)) return false;
         else this[Called].add(message);
         return ( message.parentElement.parentElement.className.match(/user-(\d+)/) || [0, UID] )[1] != UID &&
